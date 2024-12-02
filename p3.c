@@ -24,9 +24,9 @@ int main(){
     while(!end){
         printPrompt();
         char *prompt = readPrompt();
-        if(!prompt)break;
         end = processPrompt(prompt, tokens);    
     }
+
     free(tokens);
     freeList(FD, openList);
     freeList(CHAR, commandHistory);
