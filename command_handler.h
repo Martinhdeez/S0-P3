@@ -23,6 +23,8 @@
 #include <sys/mman.h>
 #include <sys/shm.h>
 #include <errno.h>
+#include <stdint.h>
+
 
 #define GREENN "\033[0;32m"
 #define BLUEE "\033[0;34m"
@@ -66,6 +68,9 @@ int Cmd_write(char *tokens[]);
 int Cmd_write(char *tokens[]);      
 int Cmd_getuid();
 int Cmd_setuid(char *tokens[]);
+int Cmd_showvar(char *tokens[]);
+int Cmd_subsvar(char *toknes[]);
+int Cmd_environ(char *tokens[]);
 int Cmd_exit();      
 
 void printAllMemList(Node *nodo, int order, int n);

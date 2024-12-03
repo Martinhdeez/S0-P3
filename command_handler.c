@@ -2085,13 +2085,143 @@ int Cmd_setuid(char *tokens[]){
 }
 
 
-Cmd_showvar(char *tokens[]){
+void printEnv(){
+    printf("Showing all environment variables:\n");
+    char **env_ptr = globalEnvp;
+    uintptr_t address; // Para almacenar la dirección de la variable de entorno.
+
+    // Iteramos a través de las variables de entorno.
+    for (int i = 0; env_ptr[i] != NULL; i++) {
+        address = (uintptr_t) &globalEnvp[i];
+        // Imprimimos la dirección y el índice, y el valor de la variable de entorno.
+        printf("%p->main arg3[%d]=%p) %s\n", (void *) address, i, (void *) env_ptr[i], env_ptr[i]);
+    }
+}
+
+int Cmd_showvar(char *tokens[]) {
+    if (tokens[1] == NULL) { // If no variables are provided, display all environment variables
+        printEnv();
+        return 0;
+    }
+
+     char *flag = tokens[1]; // The flag should be the second token
+
+    if (strcmp(flag, "-a") == 0) {
+        if (tokens[2] == NULL || tokens[3] == NULL) {
+            printf("Usage: changevar -a var val\n");
+            return -1;
+        }
+
+        //implementar aqui -a
+
+    } else if (strcmp(flag, "-e") == 0) {
+        // Modify an existing variable
+        if (tokens[2] == NULL || tokens[3] == NULL) {
+            printf("Usage: changevar -e var val\n");
+            return -1;
+        }
+        if (setenv(tokens[2], tokens[3], 1) == 0) {
+            printf("Variable '%s' updated with value '%s'.\n", tokens[2], tokens[3]);
+        } else {
+            perror("Error modifying variable with setenv");
+            return -1;
+        }
+    } else if (strcmp(flag, "-p") == 0) {
+        // Add or modify a variable using putenv
+        if (tokens[2] == NULL || tokens[3] == NULL) {
+            printf("Usage: changevar -p var val\n");
+            return -1;
+        }
+        char varAssignment[256];
+        snprintf(varAssignment, sizeof(varAssignment), "%s=%s", tokens[2], tokens[3]);
+        if (putenv(varAssignment) == 0) {
+            printf("Variable '%s' set with value '%s'.\n", tokens[2], tokens[3]);
+        } else {
+            perror("Error setting variable with putenv");
+            return -1;
+        }
+    } else {
+        printf("Invalid flag. Usage: changevar [-a|-e|-p] var val\n");
+        return -1;
+    }
 
 
     return 0;
 }
 
+int Cmd_subsvar(char *tokens[]) {
 
+    if (tokens[1] == NULL) { // Si no se pasan argumentos o flags
+        printf("Usage: subsvar [-a|-e] v1 v2 val\n");
+        return -1;
+    }
+
+    char *flag = tokens[1]; // La flag debe ser el segundo token
+
+    if (tokens[2] == NULL || tokens[3] == NULL || tokens[4] == NULL) {
+        printf("Usage: subsvar [-a|-e] v1 v2 val\n");
+        return -1;
+    }
+
+    if (strcmp(flag, "-a") == 0) {
+        // La flag -a permite reemplazar v1 con v2 y establecer un nuevo valor
+        if (getenv(tokens[2]) == NULL) { // Si v1 no existe
+            printf("Variable '%s' does not exist. Use -e to modify an existing variable.\n", tokens[2]);
+            return -1;
+        }
+
+        // Crear la nueva variable v2 con el valor dado
+        char varAssignment[256];
+        snprintf(varAssignment, sizeof(varAssignment), "%s=%s", tokens[3], tokens[4]);
+        if (putenv(varAssignment) == 0) {
+            printf("Variable '%s' created with value '%s'.\n", tokens[3], tokens[4]);
+        } else {
+            perror("Error creating variable with putenv");
+            return -1;
+        }
+    } else if (strcmp(flag, "-e") == 0) {
+        // La flag -e permite modificar v1 si existe, reemplazándola con v2 y el valor dado
+        if (getenv(tokens[2]) == NULL) { // Si v1 no existe
+            printf("Variable '%s' not found. Use -a to create a new variable.\n", tokens[2]);
+            return -1;
+        }
+
+        // Modificar v1 con el nuevo valor y reemplazar con v2
+        char varAssignment[256];
+        snprintf(varAssignment, sizeof(varAssignment), "%s=%s", tokens[3], tokens[4]);
+        if (putenv(varAssignment) == 0) {
+            printf("Variable '%s' replaced with '%s' and value '%s'.\n", tokens[2], tokens[3], tokens[4]);
+        } else {
+            perror("Error modifying variable with putenv");
+            return -1;
+        }
+    } else {
+        printf("Invalid flag. Usage: subsvar [-a|-e] v1 v2 val\n");
+        return -1;
+    }
+
+    return 0;
+}
+
+int Cmd_environ(char *tokens[]) {
+    if (tokens[1] == NULL) { // Si no se pasa ninguna flag
+       printEnv();
+    }
+
+    // Verifica si la flag es válida
+    if (strcmp(tokens[1], "-environ") == 0) {
+        printEnv();
+    } else if (strcmp(tokens[1], "-addr") == 0) {
+         for (char **env = globalEnvp; *env != NULL; env++) {
+        printf("environ:   %p (almacenado en %p)\n", (void*)*env, (void*)env);
+    }
+    } else {
+        printf("Invalid flag. Usage: environ [-environ|-addr]\n");
+        return -1;
+    }
+
+    return 0;
+}
 
 int Cmd_help(char **tokens)
 {
@@ -2276,6 +2406,9 @@ Command commands[] = {
     {"write", Cmd_write},
     {"getuid", Cmd_getuid},
     {"setuid", Cmd_setuid},
+    {"showvar", Cmd_showvar},
+    {"subsvar", Cmd_subsvar},
+    {"environ", Cmd_environ},
     {"quit", Cmd_exit},
     {"exit", Cmd_exit},
     {"bye", Cmd_exit},

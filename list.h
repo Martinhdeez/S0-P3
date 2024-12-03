@@ -77,6 +77,8 @@ extern List *commandHistory;
 extern List *openList;
 extern List *memoryList;
 
+extern char **globalEnvp;
+
 //-----------FUNCIONES LIST-------------
 List* createEmptyList(); 
 Node* first(List *list);

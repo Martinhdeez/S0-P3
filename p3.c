@@ -6,10 +6,11 @@
 #include "list.h"
 #include "command_handler.h"
 
+char **globalEnvp;
 
+int main(int argc, char *argv[], char *envp[]){
 
-int main(){
-
+    globalEnvp = envp;
     commandHistory = createEmptyList();
     openList = createEmptyList();
     Cmd_open(NULL);//inicializar open
