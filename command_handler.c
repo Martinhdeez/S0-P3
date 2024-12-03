@@ -2085,6 +2085,12 @@ int Cmd_setuid(char *tokens[]){
 }
 
 
+Cmd_showvar(char *tokens[]){
+
+
+    return 0;
+}
+
 
 
 int Cmd_help(char **tokens)

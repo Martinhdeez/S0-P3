@@ -51,7 +51,7 @@ char* readPrompt(){
         if(feof(stdin)) perror("End of entry: ");
         else perror("Error writting: ");
         
-        return NULL;
+        exit(EXIT_FAILURE);
     }
 
     // Eliminar \n al final de la línea
