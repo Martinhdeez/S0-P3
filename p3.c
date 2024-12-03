@@ -31,6 +31,6 @@ int main(){
     freeList(FD, openList);
     freeList(CHAR, commandHistory);
     freeList(MEM, memoryList);
+
     return 0;
 }
-//
